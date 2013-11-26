@@ -63,6 +63,12 @@ public class Application {
                 application.handleCall(request, response);
             }
         });
+        get(new Action("/status") {
+            @Override
+            public void handle(Request request, Response response) {
+                application.handleStatus(request, response);
+            }
+        });
 
         LOG.info("Application routes configured");
     }
@@ -71,6 +77,28 @@ public class Application {
 
     public Application(Elevators elevators) {
         this.elevators = elevators;
+    }
+
+    private void handleStatus(Request request, Response response) {
+        StringBuilder body = new StringBuilder();
+
+        int nbCabins = elevators.nbCabins();
+        body.append("nbCabins........: ").append(nbCabins).append('\n');
+        body.append("lowerFloor......: ").append(elevators.lowerFloor()).append('\n');
+        body.append("higherFloor.....: ").append(elevators.higherFloor()).append('\n');
+
+        for (int i = 0; i < nbCabins; i++) {
+            Cabin cabin = elevators.cabin(i);
+            body.append('#').append(i)
+                    .append(", floor: ").append(String.format("%3d", cabin.floor()))
+                    .append(", nbUsers: ").append(String.format("%3d", cabin.nbUsers()))
+                    .append(", dir: ").append(cabin.direction())
+                    .append('\n');
+        }
+
+        response.status(200);
+        response.contentType("plain/text");
+        response.body(body.toString());
     }
 
     private void handleCall(Request request, Response response) {

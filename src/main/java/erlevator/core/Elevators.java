@@ -68,7 +68,7 @@ public class Elevators {
         userCommands.add(new UserCommand.Go(cabin, floorToGo));
     }
 
-    Cabin cabin(int index) {
+    public Cabin cabin(int index) {
         return cabins[index];
     }
 
