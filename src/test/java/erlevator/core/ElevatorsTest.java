@@ -3,7 +3,6 @@ package erlevator.core;
 import org.junit.Before;
 import org.junit.Test;
 
-import static erlevator.core.Command.NOTHING;
 import static org.fest.assertions.Assertions.assertThat;
 
 /**
@@ -15,21 +14,19 @@ public class ElevatorsTest {
 
     @Before
     public void setUp() {
-        elevators = new Elevators();
+        elevators = new Elevators(new OmnibusStrategy());
     }
 
     @Test
     public void reset () {
-        elevators.reset(-5, 5, 10, 1);
+        elevators.reset(-5, 5, 10, 2);
 
-        Cabin cabin = elevators.cabin(0);
-        assertThat(cabin.floor()).isEqualTo(0);
-        assertThat(cabin.doorState()).isEqualTo(DoorState.CLOSED);
-    }
+        Cabin cabin0 = elevators.cabin(0);
+        assertThat(cabin0.floor()).isEqualTo(0);
+        assertThat(cabin0.doorState()).isEqualTo(DoorState.CLOSED);
 
-    @Test
-    public void nothing_when_no_user_commands() {
-        elevators.reset(-5, 5, 10, 1);
-        assertThat(elevators.nextCommands()).containsExactly(NOTHING);
+        Cabin cabin1 = elevators.cabin(1);
+        assertThat(cabin1.floor()).isEqualTo(0);
+        assertThat(cabin1.doorState()).isEqualTo(DoorState.CLOSED);
     }
 }

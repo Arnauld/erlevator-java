@@ -6,6 +6,7 @@ package erlevator.core;
 public enum Command {
     UP,
     DOWN,
+    OPEN,
     OPEN_UP,
     OPEN_DOWN,
     CLOSE,

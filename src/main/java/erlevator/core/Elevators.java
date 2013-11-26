@@ -1,6 +1,6 @@
 package erlevator.core;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -9,22 +9,47 @@ import java.util.List;
 public class Elevators {
 
     private Cabin[] cabins;
+    private LinkedList<UserCommand> userCommands;
+    private ElevatorStrategy strategy;
     private int lowerFloor;
     private int higherFloor;
-    private List<UserCommand> userCommands;
+
+    public Elevators(ElevatorStrategy strategy) {
+        this.strategy = strategy;
+    }
 
     public List<Command> nextCommands() {
-        return null;  //To change body of created methods use File | Settings | File Templates.
+        return strategy.nextCommands(userCommands);
+    }
+
+    public int lowerFloor() {
+        return lowerFloor;
+    }
+
+    public int higherFloor() {
+        return higherFloor;
     }
 
     public void reset(int lowerFloor, int higherFloor, int cabinSize, int cabinCount) {
-        this.userCommands = new ArrayList<UserCommand>();
         this.lowerFloor = lowerFloor;
         this.higherFloor = higherFloor;
-        this.cabins = new Cabin[cabinCount];
+        resetUserCommand();
+        resetCabins(cabinSize, cabinCount);
+        resetStrategy(lowerFloor, higherFloor);
+    }
 
+    private void resetUserCommand() {
+        this.userCommands = new LinkedList<UserCommand>();
+    }
+
+    private void resetCabins(int cabinSize, int cabinCount) {
+        this.cabins = new Cabin[cabinCount];
         for(int i=0;i <cabinCount; i++)
             cabins[i] = new Cabin(cabinSize, 0, DoorState.CLOSED);
+    }
+
+    private void resetStrategy(int lowerFloor, int higherFloor) {
+        this.strategy.reset(lowerFloor, higherFloor, cabins);
     }
 
     public void userExited(int cabin) {
@@ -45,5 +70,9 @@ public class Elevators {
 
     Cabin cabin(int index) {
         return cabins[index];
+    }
+
+    public int nbCabins() {
+        return cabins.length;
     }
 }

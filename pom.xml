@@ -32,6 +32,12 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.0.13</version>
+        </dependency>
+
         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
         <!-- ~~~~~~~~~~~~~~~Test~~~~~~~~~~~~~~~~ -->
         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
@@ -84,6 +90,9 @@
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

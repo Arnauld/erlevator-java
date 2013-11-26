@@ -1,8 +1,8 @@
 package erlevator.web;
 
-import erlevator.core.Command;
-import erlevator.core.Direction;
-import erlevator.core.Elevators;
+import erlevator.core.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import swoop.Action;
 import swoop.Request;
 import swoop.Response;
@@ -16,11 +16,17 @@ import static swoop.Swoop.setPort;
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class Application {
+
+    private static Logger LOG = LoggerFactory.getLogger(Application.class);
+
     public static void main(String[] args) throws Exception {
-        final Application application = new Application(new Elevators());
+        ElevatorStrategy strategy = new OmnibusStrategy();
+        final Application application = new Application(new Elevators(strategy));
 
         Integer port = Integer.valueOf(System.getenv("PORT"));
         setPort(port);
+        LOG.info("Application listening on port: {}", port);
+
         get(new Action("/nextCommands") {
             @Override
             public void handle(Request request, Response response) {
@@ -57,6 +63,8 @@ public class Application {
                 application.handleCall(request, response);
             }
         });
+
+        LOG.info("Application routes configured");
     }
 
     private final Elevators elevators;
@@ -70,6 +78,7 @@ public class Application {
         int atFloor = Integer.parseInt(request.queryParam("atFloor"));
         Direction dir = Direction.from(request.queryParam("to"));
         elevators.call(atFloor, dir);
+        response.status(200);
     }
 
     private void handleGo(Request request, Response response) {
