@@ -1,13 +1,14 @@
 package erlevator.core;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public interface ElevatorStrategy {
+public interface WeightCalculator {
+
     void reset(int lowerFloor, int higherFloor, Cabin[] cabins);
 
-    List<Command> nextCommands(Iterable<UserCommand> userCommands);
+    Weight weight(int index, Cabin cabin, UserCommand userCommand);
+
 }

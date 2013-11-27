@@ -1,16 +1,39 @@
 package erlevator.core;
 
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public abstract class UserCommand {
 
+    public static Call call(int atFloor, Direction dir) {
+        return new Call(atFloor, dir);
+    }
+
+    public static Go go(int cabin, int floorToGo) {
+        return new Go(cabin, floorToGo);
+    }
+
+    public static void tickAll(List<UserCommand> userCommands) {
+        for (UserCommand userCommand : userCommands)
+            userCommand.tick();
+    }
+
+    private int ticks;
+
+    public int ticks() {
+        return ticks;
+    }
+
+    public void tick() {
+        ticks++;
+    }
+
     public boolean isCall() {
         return this instanceof Call;
     }
+
     public boolean isGo() {
         return this instanceof Go;
     }
@@ -18,8 +41,8 @@ public abstract class UserCommand {
     public boolean implyFloor(int floor) {
         return floorImplied() == floor;
     }
-    public abstract int floorImplied();
 
+    public abstract int floorImplied();
 
     public static class Call extends UserCommand {
         public final int atFloor;

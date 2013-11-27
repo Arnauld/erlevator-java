@@ -11,6 +11,17 @@ import java.util.Random;
 public class ElevatorsSimulator {
 /*
 
+::WeightBasedElevatorStrategy#DistanceBased
+
+--------- Status ----------
+Tick.............: 500
+Arrived..........: 165
+Min. wait time...: 9
+Max. wait time...: 496
+Avg. wait time...: 179
+
+::WeightBasedElevatorStrategy#Omnibus
+
 --------- Status ----------
 Tick.............: 500
 Arrived..........: 97
@@ -18,11 +29,25 @@ Min. wait time...: 17
 Max. wait time...: 488
 Avg. wait time...: 217
 
+
+::WeightBasedElevatorStrategy#Mixed(DistanceBased, Omnibus)
+--------- Status ----------
+Tick.............: 500
+Arrived..........: 123
+Min. wait time...: 9
+Max. wait time...: 497
+Avg. wait time...: 194
  */
 
     public static void main(String[] main) {
         //Elevators elevators = new Elevators(new OmnibusStrategy());
-        Elevators elevators = new Elevators(new RawCommandPriorityStrategy());
+        //Elevators elevators = new Elevators(new WeightBasedElevatorStrategy());
+        //Elevators elevators = new Elevators(new WeightBasedElevatorStrategy(new WeightCalculatorOmnibus()));
+        Elevators elevators = new Elevators(new WeightBasedElevatorStrategy(
+                new WeightCalculatorMixed(
+                        new WeightCalculatorDistanceBased(),
+                        new WeightCalculatorOmnibus()
+                )));
         elevators.reset(-13, 27, 10, 2);
         ElevatorsSimulator simulator = new ElevatorsSimulator(elevators, 150);
         simulator.ticks(500);

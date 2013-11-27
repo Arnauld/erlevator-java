@@ -1,7 +1,8 @@
 package erlevator.core;
 
+import erlevator.util.Iterables;
+
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,9 +34,9 @@ public class OmnibusStrategy implements ElevatorStrategy {
     }
 
     @Override
-    public List<Command> nextCommands(LinkedList<UserCommand> userCommands) {
+    public List<Command> nextCommands(Iterable<UserCommand> userCommands) {
         // prevent leaks...
-        userCommands.clear();
+        Iterables.removeAll(userCommands);
 
         int nbCabins = cabins.length;
         List<Command> commands = new ArrayList<Command>(nbCabins);
@@ -49,15 +50,15 @@ public class OmnibusStrategy implements ElevatorStrategy {
 
     private Command cycle(int index, Cabin cabin) {
         Integer offset = cabin.getStrategyData();
-        try{
-            if(offset < 0)
+        try {
+            if (offset < 0)
                 return Command.NOTHING;
-            else if(offset == 0) {
+            else if (offset == 0) {
                 cabin.direction(Direction.values()[index % 2]);
                 cabin.openDoor();
                 return cabin.lastCommand();
             }
-        }finally {
+        } finally {
             cabin.setStrategyData(++offset);
         }
 

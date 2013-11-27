@@ -7,7 +7,10 @@ import swoop.Action;
 import swoop.Request;
 import swoop.Response;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.TimeZone;
 
 import static swoop.Swoop.get;
 import static swoop.Swoop.setPort;
@@ -20,12 +23,18 @@ public class Application {
     private static Logger LOG = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) throws Exception {
-        ElevatorStrategy strategy = new OmnibusStrategy();
-        final Application application = new Application(new Elevators(strategy));
+        String portS = System.getenv("PORT");
+        Integer port = (portS != null) ? Integer.valueOf(portS) : 8080;
+        LOG.info("Application port: {}", port);
 
-        Integer port = Integer.valueOf(System.getenv("PORT"));
+        ElevatorStrategy strategy = new WeightBasedElevatorStrategy();
+        Elevators elevators = new Elevators(strategy, new TimeService());
+        elevators.reset(0, 5, 10, 2);
+        bindRoutes(new Application(elevators), port);
+    }
+
+    private static void bindRoutes(final Application application, int port) {
         setPort(port);
-        LOG.info("Application listening on port: {}", port);
 
         get(new Action("/nextCommands") {
             @Override
@@ -80,24 +89,64 @@ public class Application {
     }
 
     private void handleStatus(Request request, Response response) {
+        DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        Long lastTick = elevators.lastTick();
+
         StringBuilder body = new StringBuilder();
 
         int nbCabins = elevators.nbCabins();
         body.append("nbCabins........: ").append(nbCabins).append('\n');
         body.append("lowerFloor......: ").append(elevators.lowerFloor()).append('\n');
         body.append("higherFloor.....: ").append(elevators.higherFloor()).append('\n');
+        body.append("last tick.......: ").append(lastTick != null ? df.format(lastTick) : "n/a").append('\n');
 
         for (int i = 0; i < nbCabins; i++) {
             Cabin cabin = elevators.cabin(i);
             body.append('#').append(i)
                     .append(", floor: ").append(String.format("%3d", cabin.floor()))
-                    .append(", nbUsers: ").append(String.format("%3d", cabin.nbUsers()))
-                    .append(", dir: ").append(cabin.direction())
-                    .append('\n');
+                    .append("  ");
+            switch (cabin.direction()) {
+                case UP:
+                    body.append("↑");
+                    break;
+                case DOWN:
+                    body.append("↓");
+                    break;
+            }
+            body.append(" ");
+
+            String door = "[";
+            if (cabin.isOpen()) {
+                door = "]";
+            }
+            body.append(door);
+
+            if (cabin.isFull()) {
+                body.append(door);
+            } else {
+                body.append(" ");
+            }
+
+            body.append(" ").append(String.format("%3d", cabin.nbUsers())).append(" ");
+
+            door = "]";
+            if (cabin.isOpen()) {
+                door = "[";
+            }
+
+            if (cabin.isFull()) {
+                body.append(door);
+            } else {
+                body.append(" ");
+            }
+            body.append(door);
+
+            body.append('\n');
         }
 
         response.status(200);
-        response.contentType("plain/text");
+        response.contentType("text/plain");
         response.body(body.toString());
     }
 

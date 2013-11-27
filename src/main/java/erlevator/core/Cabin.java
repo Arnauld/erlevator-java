@@ -103,4 +103,19 @@ public class Cabin {
     public boolean isOpen() {
         return DoorState.OPENED == doorState;
     }
+
+    public Command updateForTarget(int targetFloor) {
+        int cabinFloor = this.floor();
+
+        if (this.doorState() == DoorState.OPENED) {
+            this.closeDoor();
+        } else if (cabinFloor < targetFloor) {
+            this.moveUp();
+        } else if (cabinFloor > targetFloor) {
+            this.moveDown();
+        } else {
+            this.openDoorNoDirection();
+        }
+        return this.lastCommand();
+    }
 }
