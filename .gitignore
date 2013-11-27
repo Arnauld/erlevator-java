@@ -9,7 +9,6 @@ syntax: glob
 .DS_Store
 
 # lib'n misc
-lib/
 file/
 
 # eclipse conf file

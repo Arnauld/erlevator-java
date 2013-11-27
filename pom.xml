@@ -27,9 +27,9 @@
         <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
         <dependency>
-            <groupId>org.technbolts.swoop</groupId>
+            <groupId>org.technbolts</groupId>
             <artifactId>swoop</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>0.1.2</version>
         </dependency>
 
         <dependency>
@@ -63,6 +63,18 @@
         </dependency>
 
     </dependencies>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <!-- REPOSITORIES -->
+        <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+        <repositories>
+            <!-- embedded repo -->
+            <repository>
+                <id>project.local</id>
+                <name>project</name>
+                <url>file:${project.basedir}/lib</url>
+            </repository>
+        </repositories>
 
     <!-- ************************************************ -->
     <!-- *~~~~~~~~~~~~~~~~~~~~BUILD~~~~~~~~~~~~~~~~~~~~* -->
