@@ -1,5 +1,6 @@
 package erlevator.core;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,6 +24,10 @@ public class Elevators {
     public Elevators(ElevatorStrategy strategy, TimeService timeService) {
         this.strategy = strategy;
         this.timeService = timeService;
+    }
+
+    public Iterable<UserCommand> pendingCommands() {
+        return new ArrayList<UserCommand>(userCommands);
     }
 
     public int lowerFloor() {

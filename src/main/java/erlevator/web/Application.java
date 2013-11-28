@@ -7,6 +7,7 @@ import swoop.Action;
 import swoop.Request;
 import swoop.Response;
 
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -27,7 +28,11 @@ public class Application {
         Integer port = (portS != null) ? Integer.valueOf(portS) : 8080;
         LOG.info("Application port: {}", port);
 
-        ElevatorStrategy strategy = new WeightBasedElevatorStrategy();
+        ElevatorStrategy strategy = new WeightBasedElevatorStrategy(
+                new WeightCalculatorMixed(
+                        new WeightCalculatorDistanceBased(),
+                        new WeightCalculatorOmnibus()));
+
         Elevators elevators = new Elevators(strategy, new TimeService());
         elevators.reset(0, 5, 10, 2);
         bindRoutes(new Application(elevators), port);
@@ -90,7 +95,7 @@ public class Application {
 
     private void handleStatus(Request request, Response response) {
         DateFormat df = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        df.setTimeZone(TimeZone.getTimeZone("CET"));
         Long lastTick = elevators.lastTick();
 
         StringBuilder body = new StringBuilder();
@@ -108,10 +113,10 @@ public class Application {
                     .append("  ");
             switch (cabin.direction()) {
                 case UP:
-                    body.append("↑");
+                    body.append("\u2191");
                     break;
                 case DOWN:
-                    body.append("↓");
+                    body.append("\u2193");
                     break;
             }
             body.append(" ");
@@ -145,8 +150,14 @@ public class Application {
             body.append('\n');
         }
 
+        body.append('\n').append("Pending commands: ").append('\n');
+        for(UserCommand cmd : elevators.pendingCommands()) {
+            body.append(cmd).append('\n');
+        }
+
         response.status(200);
-        response.contentType("text/plain");
+        response.charset(Charset.forName("UTF-8"));
+        response.contentType("text/plain; charset=UTF-8");
         response.body(body.toString());
     }
 
